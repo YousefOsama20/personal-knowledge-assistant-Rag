@@ -1,0 +1,18 @@
+Chapter 3: Retrieval-Augmented Generation
+
+RAG stands for Retrieval-Augmented Generation.
+
+RAG allows an AI system to retrieve information
+from external documents before generating an answer.
+
+A typical RAG system contains document loading,
+chunking, embeddings, a vector database, retrieval,
+and an LLM.
+
+The vector database stores embeddings and allows
+the system to find documents that are semantically
+similar to a user's question.
+
+RAG is especially useful when an AI system needs
+to answer questions about private or frequently
+changing information.

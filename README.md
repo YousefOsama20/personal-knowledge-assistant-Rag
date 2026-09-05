@@ -1,3 +1,4 @@
+# personal-knowledge-assistant-Rag
 
 ### 1. Create Your Environment
 
@@ -23,4 +24,4 @@ source .venv/bin/activate
 # 3. Run the script
 python3 Agent_files/GEMINI.py
 
-```# personal-knowledge-assistant-Rag
+```
