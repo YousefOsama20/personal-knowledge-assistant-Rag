@@ -1,7 +1,13 @@
 
-
-def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
-    """Split text into overlapping chunks."""
+def chunk_documents(
+    documents: list[dict],
+    chunk_size: int = 500,
+    overlap: int = 50,
+) -> list[dict]:
+    """
+    Split documents into overlapping chunks
+    while preserving metadata.
+    """
 
     if chunk_size <= 0:
         raise ValueError("chunk_size must be greater than 0")
@@ -16,16 +22,28 @@ def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]
 
     chunks = []
 
-    start = 0
+    for document in documents:
 
-    while start < len(text):
-        end = start + chunk_size
+        text = document["text"]
+        metadata = document["metadata"]
 
-        chunk = text[start:end].strip()
+        start = 0
 
-        if chunk:
-            chunks.append(chunk)
+        while start < len(text):
 
-        start = end - overlap
+            end = start + chunk_size
+
+            chunk_text = text[start:end].strip()
+
+            if chunk_text:
+
+                chunks.append(
+                    {
+                        "text": chunk_text,
+                        "metadata": metadata.copy(),
+                    }
+                )
+
+            start = end - overlap
 
     return chunks
