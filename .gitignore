@@ -179,3 +179,11 @@ cython_debug/
 
 # generated images
 gen_images/
+
+# ChromaDB data
+data/chroma/*
+!data/chroma/
+
+# User uploads
+data/uploads/*
+!data/uploads/
