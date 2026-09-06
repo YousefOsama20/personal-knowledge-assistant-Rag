@@ -2,21 +2,20 @@ from loaders import load_document
 from chunker import chunk_documents
 from embeddings import EmbeddingModel
 from vector_store import VectorStore
-from retriever import Retriever
+from llm import GeminiLLM
+from rag import RAG
 
-
-# --------------------------------
+# ==========================================
 # 1. Load document
-# --------------------------------
+# ==========================================
 
 file_path = "data/uploads/test2.txt"
 
 documents = load_document(file_path)
 
-
-# --------------------------------
-# 2. Chunk documents
-# --------------------------------
+# ==========================================
+# 2. Chunk document
+# ==========================================
 
 chunks = chunk_documents(
     documents,
@@ -24,9 +23,9 @@ chunks = chunk_documents(
     overlap=50,
 )
 
-# --------------------------------
-# 3. Embeddings
-# --------------------------------
+# ==========================================
+# 3. Create embeddings
+# ==========================================
 
 embedding_model = EmbeddingModel()
 
@@ -34,21 +33,9 @@ embeddings = embedding_model.embed_documents(
     [chunk["text"] for chunk in chunks]
 )
 
-# --------------------------------
-# 4. Metadata
-# --------------------------------
-
-metadatas = [chunk["metadata"] for chunk in chunks]
-
-# --------------------------------
-# 5. IDs
-# --------------------------------
-
-ids = [f"test_chunk_{i}" for i in range(len(chunks))]
-
-# --------------------------------
-# 6. Vector Store
-# --------------------------------
+# ==========================================
+# 4. Store in vector database
+# ==========================================
 
 vector_store = VectorStore()
 
@@ -58,59 +45,61 @@ vector_store.add_documents(
         for chunk in chunks
     ],
     embeddings=embeddings,
-    ids=ids,
-    metadatas=metadatas,
+    ids=[
+        f"test_chunk_{i}"
+        for i in range(len(chunks))
+    ],
+    metadatas=[
+        chunk["metadata"]
+        for chunk in chunks
+    ],
 )
 
-# --------------------------------
-# 7. Retriever
-# --------------------------------
+# ==========================================
+# 5. Create LLM
+# ==========================================
 
-retriever = Retriever(
+llm = GeminiLLM()
+
+
+# ==========================================
+# 6. Create RAG
+# ==========================================
+
+rag = RAG(
     embedding_model=embedding_model,
     vector_store=vector_store,
+    llm=llm,
     top_k=3,
 )
 
-# --------------------------------
-# 8. Ask question
-# --------------------------------
+# ==========================================
+# 7. Ask question
+# ==========================================
 
-question = "What is Retrieval Augmented Generation?"
+result = rag.ask(
+    "What is Retrieval Augmented Generation?"
+)
 
-# --------------------------------
-# 9. Retrieve
-# --------------------------------
-
-results = retriever.retrieve(question)
-
-# --------------------------------
-# 10. Display
-# --------------------------------
+# ==========================================
+# 8. Print answer
+# ==========================================
 
 print("\n" + "=" * 60)
-print("QUESTION")
+print("ANSWER")
 print("=" * 60)
 
-print(question)
+print(result["answer"])
 
+# ==========================================
+# 9. Print sources
+# ==========================================
 
 print("\n" + "=" * 60)
-print("RETRIEVED CHUNKS")
+print("SOURCES")
 print("=" * 60)
 
-
-for i, result in enumerate(results, start=1):
-
-    print("\n" + "-" * 60)
-    print(f"RESULT {i}")
-    print("-" * 60)
-
-    print("TEXT:")
-    print(result["text"])
-
-    print("\nMETADATA:")
-    print(result["metadata"])
-
-    print("\nDISTANCE:")
-    print(result["distance"])
+for source in result["sources"]:
+    print(
+        source["metadata"]
+    )
