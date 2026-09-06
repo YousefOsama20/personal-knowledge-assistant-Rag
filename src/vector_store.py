@@ -1,11 +1,18 @@
 import chromadb
+import uuid
+
 
 class VectorStore:
-
     def __init__(
         self,
-        persist_directory: str = "data/chroma",
+        base_directory: str = "data/chroma",
     ):
+        run_id = uuid.uuid4().hex
+
+        persist_directory = (
+            f"{base_directory}/run_{run_id}"
+        )
+
         self.client = chromadb.PersistentClient(
             path=persist_directory
         )
@@ -28,8 +35,6 @@ class VectorStore:
         ids: list[str],
         metadatas: list[dict],
     ):
-        """Store documents, embeddings, IDs, and metadata."""
-
         self.collection.upsert(
             ids=ids,
             documents=documents,
@@ -47,5 +52,4 @@ class VectorStore:
         return self.collection.query(
             query_embeddings=[query_embedding],
             n_results=n_results,
-    )
-
+        )
